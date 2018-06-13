@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Výpočet mzdy</title>
+    <script src="angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    
+</head>
+<body>
+    <div ng-app="myApp" ng-controller="myCtrl">
+    <p>Hrubá mzda: <input type="number" min="0" limit-to-min ng-model="hMzda"></p>
+    <h3>Čistá mzda Kč: {{cistaMzda()}}</h3>
+    <p>Hrubá mzda Kč: {{hMzda}}</p>
+    <p>Zdrav. poj. zam. Kč: {{zdrPojZmv()}}</p>
+    <p>Soc. poj. zam. Kč: {{socPojZmv()}}</p>
+    <p>Superhrubá mzda Kč: {{suprHruMzda()}}</p>
+    <p>Základ pro výpočet zálohy na daň Kč: {{suprHruMzdaZ()}}</p>    
+    <p>Daň před slevou Kč: {{danPredSlev()}}</p>    
+    <p>Sleva na poplatníka Kč: {{slevaNaPopl}}</p>
+    <p>Počet dětí (bez průkazu ZTP/P): <input type="number" value="0" min="0" max="30" limit-to-max limit-to-min ng-model="pocDeti" ></p>
+    <p>Daňové zvýhodnění na dětí Kč: {{danZvDeti()}}</p>
+    <p>Počet dětí z průkazem ZTP/P: <input type="number" value="0" min="0" max="30" limit-to-max limit-to-min ng-model="pocDetiZTP" ></p>    
+    <p>Daňové zvýhodnění na děti z průkazem ZTP/P Kč: {{danZvDetiZTP()}}</p>
+    <p>Sleva na vyživovaného manžela ZTP/P Kč: <input type="checkbox" ng-model="manzelZTP" >{{manzelZTPchecked()}}</p>
+    <p>Sleva pro invalidní důchod I. a II. stupně Kč: <input type="checkbox" ng-model="invIaII">{{invIaIIchecked()}}</p>
+    <p>Sleva pro invalidní důchod III. Stupně Kč: <input type="checkbox" ng-model="invIII">{{invIIIchecked()}}</p>
+    <p>Sleva pro držitele průkazu ZTP/P Kč: <input type="checkbox" ng-model="prukZTP">{{prukZTPchecked()}}</p>
+    <p>Sleva pro studenta Kč: <input type="checkbox" ng-model="slevaStud">{{slevaStudchecked()}}</p>
+    <p>Slevy na dani celkem Kč: {{slevaNaPopl+danZvDeti()+danZvDetiZTP()+manzelZTPchecked()+invIaIIchecked()+invIIIchecked()+prukZTPchecked()+slevaStudchecked()}}</p>
+    <p>Daň Kč:  {{vypDan()}}</p>
+    <p>Daňové zvýhodnění na děti Kč: {{danZvDetiCelkem()}}</p>
+    <p>Daňový bonus celkem Kč: {{danBonus()}}</p>
+    <p>Zdravotní pojištění (zaměstnanec) Kč: {{zdrPojZam()}}</p>
+    <p>Sociální pojištění (zaměstnanec) Kč: {{socPojZam()}}</p>
+   
+
+    </div>
+
+    <script>
+        var app = angular.module("myApp",[]);
+
+        app.controller("myCtrl", function($scope){
+            
+            $scope.hMzda = 12200
+            
+            $scope.zdrPojZmv = function(){
+               
+                  return Math.ceil(osetreniPolozky($scope.hMzda)*0.09);
+               
+            }
+            $scope.socPojZmv = function(){
+                
+                    return Math.ceil(osetreniPolozky($scope.hMzda)*0.25);
+                
+            }
+            $scope.suprHruMzda = function(){
+               
+                return osetreniPolozky($scope.hMzda)+$scope.zdrPojZmv()+$scope.socPojZmv();
+               
+            }
+            $scope.suprHruMzdaZ = function(){
+                return Math.ceil($scope.suprHruMzda()/100)*100
+            }
+            $scope.danPredSlev = function(){
+                return $scope.suprHruMzdaZ()*0.15
+            }
+            $scope.slevaNaPopl = 2070
+            $scope.pocDeti = 0
+            $scope.danZvDeti = function(){
+                
+                switch($scope.pocDeti){
+                    case null:
+                        return 0
+                        break;
+                    case 0:
+                        return 0
+                        break;
+                    case 1:
+                        return 1117
+                        break;
+                    case 2:
+                        return 1117+1617
+                        break;
+                    case 3:
+                        return 1117+1617+2017
+                        break;
+                    default: 
+                        return 1117+1617+2017;    
+                    }
+                    
+            }
+            $scope.pocDetiZTP = 0
+            $scope.danZvDetiZTP = function(){
+                 switch($scope.pocDetiZTP){
+                    case null:
+                        return 0
+                        break;
+                    case 0:
+                        return 0
+                        break;
+                    case 1:
+                        return 2234
+                        break;
+                    case 2:
+                        return 2234+3234
+                        break;
+                    case 3:
+                       return 2234+3234+4034
+                       break;
+                    default: 
+                        return 2234+3234+4034;                                  
+                    } 
+            }
+            
+            $scope.manzelZTPchecked = function(){
+                manzelZTPNe = 0
+                manzelZTPAno = 4140
+                if ($scope.manzelZTP == true){
+                    return manzelZTPAno;
+                    } else {return manzelZTPNe;}
+            }
+
+            $scope.invIaIIchecked = function(){
+                invIaIINe = 0
+                invIaIIAno = 210
+                if ($scope.invIaII == true){
+                    return invIaIIAno;
+                    } else {return invIaIINe;}
+            }
+
+            $scope.invIIIchecked = function(){
+                invIIINe = 0
+                invIIIAno = 420
+                if ($scope.invIII == true){
+                    return invIIIAno;
+                    } else {return invIIINe;}
+            }
+
+            $scope.prukZTPchecked = function(){
+                prukZTPNe = 0
+                prukZTPAno = 1345
+                if ($scope.prukZTP == true){
+                    return prukZTPAno;
+                    } else {return prukZTPNe;}
+            }
+
+            $scope.slevaStudchecked = function(){
+                slevaStudNe = 0
+                slevaStudAno = 335
+                if ($scope.slevaStud == true){
+                    return slevaStudAno;
+                    } else {return slevaStudNe;}
+            }
+            
+            $scope.vypDan = function(){
+               slevyOst = $scope.slevaNaPopl + $scope.manzelZTPchecked() + $scope.invIaIIchecked() + $scope.invIIIchecked() + $scope.prukZTPchecked() + $scope.slevaStudchecked()
+               dan = $scope.danPredSlev() - slevyOst
+               if (dan > 0){ return dan;} else{ return 0;}
+            }
+
+            $scope.danZvDetiCelkem = function(){
+               
+               return danZvDetiCel = $scope.danZvDeti() + $scope.danZvDetiZTP();
+            }
+
+            $scope.danBonus = function() {
+               bonus = $scope.danZvDetiCelkem() - $scope.vypDan()
+               if (bonus <= 0){ return 0;} else{ return bonus;}
+            }
+
+            $scope.socPojZam = function(){
+                return Math.ceil(osetreniPolozky($scope.hMzda)*0.065) 
+            }
+
+            $scope.zdrPojZam = function(){
+                
+                return Math.ceil(osetreniPolozky($scope.hMzda)*0.045) 
+            }
+                
+            $scope.cistaMzda = function(){
+                cistaMzd = osetreniPolozky($scope.hMzda) - $scope.vypDan() + $scope.danZvDetiCelkem() - $scope.socPojZam() - $scope.zdrPojZam() 
+
+                // if ($scope.hMzda < 73.2) {
+                //      if ($scope.hMzda == 0){ 
+                //         return 0;
+                //     }
+                //      return 73.20   
+                // } else {
+                //     return cistaMzd;
+                // }
+
+                return cistaMzd;
+            }
+        
+            
+
+
+            function osetreniPolozky(opolozka){
+            if(opolozka == NaN){
+                return 0;
+            } else {
+                return opolozka;
+            }
+        }
+             
+
+        });
+        app.directive("limitToMax", function() {
+            return {
+                link: function(scope, element, attributes) {
+                element.on("keydown keyup", function(e) {
+                if (Number(element.val()) > Number(attributes.max) &&
+                    e.keyCode != 46 // delete
+                    &&
+                    e.keyCode != 8 // backspace
+                    ) {
+                    e.preventDefault();
+                    element.val(attributes.max);
+                    }
+                });
+                }
+                };
+            });
+
+        app.directive("limitToMin", function() {
+            return {
+                link: function(scope, element, attributes) {
+                element.on("keydown keyup", function(e) {
+                if (Number(element.val()) < Number(attributes.min) &&
+                    e.keyCode != 46 // delete
+                    &&
+                    e.keyCode != 8 // backspace
+                    ) {
+                    e.preventDefault();
+                    element.val(attributes.min);
+                    }
+                });
+                }
+                };
+            });
+
+                             
+    </script>
+</body>
+</html>
