@@ -15,7 +15,7 @@
     <p>Zdrav. poj. zam. Kč: {{zdrPojZmv()}}</p>
     <p>Soc. poj. zam. Kč: {{socPojZmv()}}</p>
     <p>Superhrubá mzda Kč: {{suprHruMzda()}}</p>
-    <p>Základ pro výpočet zálohy na daň Kč: {{suprHruMzdaZ()}}</p>    
+    <p>Základ pro výpočet zálohy na daň Kč: {{hruMzdaZakl()}}</p>    
     <p>Daň před slevou Kč: {{danPredSlev()}}</p>    
     <p>Sleva na poplatníka Kč: {{slevaNaPopl}}</p>
     <p>Počet dětí (bez průkazu ZTP/P): <input type="number" value="0" min="0" max="30" limit-to-max limit-to-min ng-model="pocDeti" ></p>
@@ -42,7 +42,7 @@
 
         app.controller("myCtrl", function($scope){
             
-            $scope.hMzda = 12200
+            $scope.hMzda = 17300
             
             $scope.zdrPojZmv = function(){
                
@@ -59,13 +59,15 @@
                 return osetreniPolozky($scope.hMzda)+$scope.zdrPojZmv()+$scope.socPojZmv();
                
             }
-            $scope.suprHruMzdaZ = function(){
-                return Math.ceil($scope.suprHruMzda()/100)*100
+            $scope.hruMzdaZakl = function(){
+                //return Math.ceil($scope.suprHruMzda()/100)*100
+                return $scope.hMzda
+
             }
             $scope.danPredSlev = function(){
-                return $scope.suprHruMzdaZ()*0.15
+                return $scope.hruMzdaZakl()*0.15
             }
-            $scope.slevaNaPopl = 2070
+            $scope.slevaNaPopl = 2570
             $scope.pocDeti = 0
             $scope.danZvDeti = function(){
                 
